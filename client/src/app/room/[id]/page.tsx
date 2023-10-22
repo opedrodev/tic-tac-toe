@@ -71,6 +71,7 @@ export default function Room() {
 
     function handleSubmitMessage(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
+        if (!input || input.length === 0 || input.trim().length === 0) return
         const formData = new FormData(event.currentTarget)
         const message = formData.get('msg') as string
         socket.emit('send-message', { roomId: id, userId: socket.id, message })
