@@ -23,6 +23,8 @@ export default function Room() {
     const [input, setInput] = useState<string>('')
     const [playerWon, setPlayerWon] = useState<string>('')
 
+    const [canPlay, setCanPlay] = useState<boolean>(true)
+
     const sectionRef = useRef<HTMLDivElement>(null)
 
     function updateBoard(board: string[]) {
@@ -37,6 +39,10 @@ export default function Room() {
         socket.on('connect', () => {
             setUsers((users) => [...users, socket.id])
             socket.emit('join-room', { roomId: id, userId: socket.id })
+
+            if (users.length === 2) {
+                setCanPlay(false)
+            }
         })
 
         socket.on('user-connected', (id: string, room: string[]) => {
@@ -79,6 +85,7 @@ export default function Room() {
     }
 
     function handleCellClick(cell: number) {
+        if (!canPlay) return
         if (turn !== socket.id) return
 
         const board = sectionRef.current?.childNodes
