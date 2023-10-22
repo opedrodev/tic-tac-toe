@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { io } from 'socket.io-client'
 
 export default function useSocket() {
-    const socket = useMemo(() => io('http://localhost:3001', {
+    const socket = useMemo(() => io('https://tic-tac-toe-production-6179.up.railway.app', {
         transports: ['websocket'],
     }), [])
 
