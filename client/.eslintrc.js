@@ -5,4 +5,10 @@ module.exports = {
         tsconfigRootDir: __dirname,
         sourceType: 'module',
     },
+    rules: {
+        'no-console': 'off',
+        'import/no-extraneous-dependencies': 'off',
+        'import/extensions': 'off',
+        'import/no-unresolved': 'off',
+    },
 }
