@@ -1,6 +1,8 @@
 import express, { Application } from 'express'
 import { Server } from 'socket.io'
 import http from 'http'
+import { JoinRoom } from './listeners/RoomListener'
+import Events from './listeners/Events'
 
 export default class App {
     public server: http.Server
@@ -9,7 +11,7 @@ export default class App {
 
     private readonly io: Server
 
-    private rooms: Record<string, string[]> = {}
+    private readonly rooms: Record<string, string[]> = {}
 
     constructor() {
         this.app = express()
@@ -34,24 +36,15 @@ export default class App {
         this.io.on('connection', (socket) => {
             console.log(`User ${socket.id} connected.`)
 
-            socket.on('join-room', ({ roomId, userId }: { roomId: string, userId: string }) => {
-                if (!this.rooms[roomId]) {
-                    this.rooms[roomId] = []
-                }
+            socket.on(
+                Events.JOIN_ROOM,
+                ({ roomId, userId }) => JoinRoom(
+                    { socket, io: this.io }, { rooms: this.rooms, roomId, userId },
+                ),
+            )
 
-                this.rooms[roomId].push(userId)
-
-                socket.join(roomId)
-                this.io.to(roomId).emit('user-connected', userId, this.rooms[roomId])
-
-                socket.on('player-won', ({ roomId, userId }: { roomId: string, userId: string }) => {
-                    this.io.to(roomId).emit('player-won', userId)
-                })
-
-                socket.on('disconnect', () => {
-                    this.rooms[roomId] = this.rooms[roomId].filter((id) => id !== userId)
-                    this.io.to(roomId).emit('user-disconnected', userId, this.rooms[roomId])
-                })
+            socket.on('player-won', ({ roomId, userId }: { roomId: string, userId: string }) => {
+                this.io.to(roomId).emit('player-won', userId)
             })
 
             socket.on('cell-click', ({
