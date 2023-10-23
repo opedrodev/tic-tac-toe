@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { io } from 'socket.io-client'
 
 export default function useSocket() {
-    const socket = useMemo(() => io('https://tic-tac-toe-production-6179.up.railway.app', {
+    const socket = useMemo(() => io(process.env.WS_SERVER_URL as string, {
         transports: ['websocket'],
     }), [])
 
